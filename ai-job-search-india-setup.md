@@ -6,6 +6,10 @@ on a new machine. Instruction to Claude: work through the sections in order,
 checking what's already installed before installing anything, and ask the
 user before doing anything destructive (force pushes, deleting remotes, etc.).
 
+**Before running the setup interview (section 3), Claude MUST ask the user the
+two questions in section 2.5 and wait for answers.** Do not populate any profile
+files until both are resolved.
+
 ## 0. Clone the repo (skip if already cloned)
 
 ```bash
@@ -120,6 +124,46 @@ run with plain `bun`; installing for them only pulls TypeScript dev types.
 If you're outside Denmark, generate an equivalent search skill for a local
 job board with `/add-portal` inside Claude Code — it scaffolds the same CLI
 structure for any public portal.
+
+## 2.5 Information Claude must collect before setup
+
+**Instruction to Claude:** before running `/setup` (section 3), ask the user both
+questions below and wait for answers. Do not read documents into, or write, any
+profile file until both are resolved.
+
+### a. Where should the personalized data be stored?
+
+`/setup` writes personal data — name, contact details, employment history,
+education, salary expectations — into **tracked** files. Anything committed and
+pushed to a public repo is visible to everyone. Ask the user which they want:
+
+- **Make this repo private** — `gh repo edit <owner/repo> --visibility private`.
+  Only works if the repo is **not a fork** (GitHub blocks making a fork private).
+- **New private repo** (recommended when the current `origin` is a public fork) —
+  create a fresh private repository, set it as `origin`, and keep the public
+  template as a separate remote named `template` or `upstream`. Full steps in
+  section 7.
+- **Local only** — keep every profile commit local and never push it.
+
+If `origin` is already a **private, non-fork** repository, say so and move on —
+no change needed.
+
+### b. Which career documents can the user provide?
+
+Ask the user to drop whatever they have into `documents/` **before** setup runs
+(see `documents/README.md` for the full spec). Accepted: text-based `.pdf`,
+`.tex`, `.md`, `.txt` — **not** `.docx`, and **not** scanned images.
+
+| Folder | What goes there | Priority |
+| ------ | --------------- | -------- |
+| `documents/cv/` | Most complete master CV (not a role-tailored variant) | Strongly recommended |
+| `documents/linkedin/` | LinkedIn profile export — Profile → More → Save to PDF | Recommended |
+| `documents/diplomas/` | Degree certificates / transcripts | Optional |
+| `documents/references/` | Reference letters | Optional |
+
+Wait until the user confirms the files are in place, then use `/setup` Path A. If
+the user has no documents at all, fall back to Path C (interview mode) and ask the
+profile questions conversationally.
 
 ## 3. Run the setup interview
 
